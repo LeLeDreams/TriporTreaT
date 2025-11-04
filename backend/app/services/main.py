@@ -8,8 +8,8 @@ load_dotenv()
 
 app = FastAPI(title="TripTreat API")
 
-RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY")
-RAPIDAPI_HOST = "tripadvisor-scraper.p.rapidapi.com"
+API_KEY = os.getenv("API_KEY")
+API_HOST = "tripadvisor-scraper.p.rapidapi.com"
 
 
 @app.get("/hotels")
@@ -18,11 +18,11 @@ async def list_hotels(
     page: int = Query(1, ge=1, description="Result page number, default 1"),
 ) -> Dict[str, Any]:
     """Proxy to TripAdvisor scraper. Always return a dict."""
-    if not RAPIDAPI_KEY:
-        raise HTTPException(status_code=500, detail="Missing RAPIDAPI_KEY in environment")
+    if not API_KEY:
+        raise HTTPException(status_code=500, detail="Missing API_KEY in environment")
 
     url = "https://tripadvisor-scraper.p.rapidapi.com/hotels/list"
-    headers = {"X-RapidAPI-Key": RAPIDAPI_KEY, "X-RapidAPI-Host": RAPIDAPI_HOST}
+    headers = {"X-RapidAPI-Key": API_KEY, "X-RapidAPI-Host": API_HOST}
     params = {"query": city, "page": page}
 
     try:
