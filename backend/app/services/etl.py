@@ -1,45 +1,50 @@
-from app.db.database import get_connection
+import psycopg2
+from psycopg2.extras import execute_values
+import os
 
-def save_hotels_to_db(data: dict):
-    conn = get_connection()
+def save_hotels_to_db(data):
+    conn = psycopg2.connect(
+    dbname=os.getenv("DB_NAME"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    host=os.getenv("DB_HOST"),
+    port=os.getenv("DB_PORT")
+)
+
     cur = conn.cursor()
 
-    by_id = data.get("by_id", {})
-    city = data.get("city")
-    page = data.get("page")
+    hotels = []
+    for hotel_id, h in data["by_id"].items():
+        hotels.append((
+            hotel_id,
+            data["city"],
+            h["name"],
+            h["rating"],
+            h["address"],
+            h["price_min"],
+            h["price_max"],
+            h["link"],
+            h["lat"],
+            h["lng"]
+        ))
 
-    for hotel_id, info in by_id.items():
-        cur.execute(
-            """
-            INSERT INTO hotels (id, name, rating, address, price_min, price_max, link, lat, lng, city, page)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT (id) DO UPDATE SET
-                name = EXCLUDED.name,
-                rating = EXCLUDED.rating,
-                address = EXCLUDED.address,
-                price_min = EXCLUDED.price_min,
-                price_max = EXCLUDED.price_max,
-                link = EXCLUDED.link,
-                lat = EXCLUDED.lat,
-                lng = EXCLUDED.lng,
-                city = EXCLUDED.city,
-                page = EXCLUDED.page;
-            """,
-            (
-                hotel_id,
-                info.get("name"),
-                info.get("rating"),
-                info.get("address"),
-                info.get("price_min"),
-                info.get("price_max"),
-                info.get("link"),
-                info.get("lat"),
-                info.get("lng"),
-                city,
-                page,
-            ),
-        )
+    query = """
+        INSERT INTO hotels (
+            id, city, name, rating, address, price_min, price_max, link, lat, lng
+        ) VALUES %s
+        ON CONFLICT (id)
+        DO UPDATE SET
+            name = EXCLUDED.name,
+            rating = EXCLUDED.rating,
+            address = EXCLUDED.address,
+            price_min = EXCLUDED.price_min,
+            price_max = EXCLUDED.price_max,
+            link = EXCLUDED.link,
+            lat = EXCLUDED.lat,
+            lng = EXCLUDED.lng;
+    """
 
+    execute_values(cur, query, hotels)
     conn.commit()
     cur.close()
     conn.close()
