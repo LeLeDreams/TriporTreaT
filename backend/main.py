@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Query
 from typing import Any, Dict
 from app.services import fetch_data,etl
+from app.api.hotel_api import router as hotel_router
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine
 
@@ -9,6 +10,7 @@ from dotenv import load_dotenv
 
 
 app = FastAPI(title="TripTreat API")
+app.include_router(hotel_router)
 
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
@@ -57,4 +59,9 @@ async def list_hotels(
         return {"message": f"Fetched and saved {data['count']} hotels for {city}"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/")
+def root():
+    return {"message": "Hotel API is running!"}
 
