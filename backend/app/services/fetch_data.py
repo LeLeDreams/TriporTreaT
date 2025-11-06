@@ -43,12 +43,17 @@ async def fetch_hotels_all(city: str, api_key: str, api_host: str) -> Dict[str, 
 
             def project(h: dict) -> dict:
                 pr = h.get("price_range_usd") or {}
+                price_min = pr.get("min")
+                price_max = pr.get("max")
+                price_avg = (price_min + price_max) / 2 if price_min is not None and price_max is not None else None
+
                 return {
                     "name": h.get("name"),
                     "rating": h.get("rating"),
                     "address": h.get("address"),
-                    "price_min": pr.get("min"),
-                    "price_max": pr.get("max"),
+                    "price_min": price_min,
+                    "price_max": price_max,
+                    "price_avg": price_avg,
                     "link": h.get("link"),
                     "lat": h.get("latitude"),
                     "lng": h.get("longitude"),
