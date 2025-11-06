@@ -1,6 +1,7 @@
 import os
 import psycopg2
 from dotenv import load_dotenv
+from contextlib import contextmanager
 
 load_dotenv()
 
@@ -12,3 +13,17 @@ def get_connection():
         host=os.getenv("DB_HOST", "localhost"),
         port=os.getenv("DB_PORT", "5432"),
     )
+
+@contextmanager
+def get_db_cursor():
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        yield cursor
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        cursor.close()
+        conn.close()
