@@ -11,6 +11,3 @@ __pycache__/
 # Virtual env
 venv/
 
-# Editor
-.vscode/
-.idea/
