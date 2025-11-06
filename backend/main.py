@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Query
 from typing import Any, Dict
 from app.services import fetch_data,etl
-from app.api.hotel_api import router as hotel_router
+from app.services.api.hotel_api import router as hotel_router
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine
 

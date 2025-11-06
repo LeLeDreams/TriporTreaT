@@ -2,7 +2,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 from typing import Optional
-from ..db.database import get_db_cursor   # <-- relative import (works when run from backend/)
+from app.db.database import get_db_cursor   # <-- relative import (works when run from backend/)
 import psycopg2
 import pandas as pd
 import os
