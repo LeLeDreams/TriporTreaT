@@ -23,6 +23,7 @@ def save_hotels_to_db(data):
             h["address"],
             h["price_min"],
             h["price_max"],
+            h["price_avg"],
             h["link"],
             h["lat"],
             h["lng"]
@@ -30,7 +31,7 @@ def save_hotels_to_db(data):
 
     query = """
         INSERT INTO hotels (
-            id, city, name, rating, address, price_min, price_max, link, lat, lng
+            id, city, name, rating, address, price_min, price_max, price_avg, link, lat, lng
         ) VALUES %s
         ON CONFLICT (id)
         DO UPDATE SET
@@ -39,6 +40,7 @@ def save_hotels_to_db(data):
             address = EXCLUDED.address,
             price_min = EXCLUDED.price_min,
             price_max = EXCLUDED.price_max,
+            price_avg = EXCLUDED.price_avg,
             link = EXCLUDED.link,
             lat = EXCLUDED.lat,
             lng = EXCLUDED.lng;
